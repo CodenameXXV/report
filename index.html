@@ -375,7 +375,7 @@
 		}
 
 		.template-btn.used.vocabulary {
-			background: #28a745 !important;
+			background: #496eed !important;
 		}
 
         .template-btn:hover {
@@ -1294,7 +1294,10 @@
 				}
 			}
 			
-			updateLevelHeader(); // ← ДОДАТИ ЦЕЙ РЯДОК
+			// Скидаємо стан всіх шаблонів при зміні активного студента
+			resetAllTemplates();
+			
+			updateLevelHeader();
 		}
 		
 		function updateLevelHeader() {
