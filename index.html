@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Report Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(-50px, -50px) rotate(0deg); }
+            100% { transform: translate(-50px, -50px) rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .month-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .month-section select {
+            padding: 12px 20px;
+            font-size: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .month-section select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .level-selection-section {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 2px solid #2196f3;
+            box-shadow: 0 5px 20px rgba(33, 150, 243, 0.1);
+        }
+
+        .level-selection-section h3 {
+            color: #1976d2;
+            margin-bottom: 2px;
+            font-size: 20px;
+        }
+
+        .level-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .level-btn {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        .level-btn.active {
+            background: linear-gradient(135deg, #4caf50, #388e3c);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .level-btn.active::after {
+            content: '✓';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .student-card {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .student-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .student-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .student-card:hover::before {
+            width: 8px;
+        }
+
+        .student-card.active {
+            border-color: #56cd73;
+			border-width: 5px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f4;
+        }
+
+        .student-name-input {
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            min-width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .student-name-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .remove-student {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .remove-student:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .topics-section {
+            margin-bottom: 25px;
+        }
+
+        .topics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            padding: 5px 0;
+        }
+
+        .topics-header h4 {
+            font-size: 16px;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .add-topic-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .add-topic-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .topic-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 12px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .topic-item input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .topic-item input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .remove-topic {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .remove-topic:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+
+        .templates-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            display: none;
+        }
+
+        .templates-section.show {
+            display: block;
+        }
+
+        .templates-section h5 {
+            margin-bottom: 15px;
+            color: #495057;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .template-btn {
+            background: #6c757d;
+            color: black;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            margin: 3px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .template-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        .template-btn.grammar {
+            background: #dadaf7;
+        }
+
+        .template-btn.vocabulary {
+            background: #ccdef3;;
+        }
+
+        .level-header {
+            background: linear-gradient(135deg, #495057, #343a40);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .current-level-display {
+            background: linear-gradient(135deg, #4caf50, #388e3c);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .main-buttons {
+            text-align: center;
+            margin: 30px 0;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 5px 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .add-student-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .add-student-btn:hover {
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+        }
+
+        .copy-btn:hover {
+            box-shadow: 0 10px 25px rgba(23, 162, 184, 0.4);
+        }
+
+        .output {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            max-height: 600px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+            color: #333;
+        }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .student-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+
+            .student-name-input {
+                min-width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .templates-section {
+                padding: 15px;
+            }
+
+            .template-btn {
+                font-size: 10px;
+                padding: 4px 8px;
+            }
+
+            .level-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .level-btn {
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 English Report Generator</h1>
+            <p>STUDY HARD SCHOOL</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="month-section">
+                <label for="month"><strong>🗓️ Оберіть місяць звіту:</strong></label><br><br>
+                <select id="month">
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
+            </div>
+
+            <!-- Level Selection Section -->
+            <div class="level-selection-section">
+                <h3>🎯 Оберіть рівень володіння англійською</h3>
+                <div class="level-buttons">
+                    <button class="level-btn" onclick="selectLevel('A1')">📚 A1 - Beginner</button>
+                    <button class="level-btn" onclick="selectLevel('A2')">📖 A2 - Elementary</button>
+                    <button class="level-btn" onclick="selectLevel('B1')">📘 B1 - Intermediate</button>
+                    <button class="level-btn" onclick="selectLevel('B2')">📗 B2 - Upper-Intermediate</button>
+                    <button class="level-btn" onclick="selectLevel('C1')">📕 C1 - Advanced</button>
+                </div>
+            </div>
+
+            <!-- Templates Section - Initially Hidden -->
+            <div id="templates-section" class="templates-section">
+                <div id="templates-content">
+                    <!-- Templates will be loaded here based on selected level -->
+                </div>
+            </div>
+
+            <div id="students-container">
+                <!-- Students will be added here -->
+            </div>
+
+			<!-- Stats Panel -->
+			<div class="stats-panel">
+				<div class="stat-card">
+					<div class="stat-number" id="students-count">0</div>
+					<div class="stat-label">Студентів</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-number" id="grammar-count">0</div>
+					<div class="stat-label">Граматичних тем</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-number" id="vocabulary-count">0</div>
+					<div class="stat-label">Лексичних тем</div>
+				</div>
+			</div>
+
+            <div class="main-buttons">
+                <button class="btn add-student-btn" onclick="addStudent()">👥 Додати студента</button>
+                <button class="btn" onclick="generateReport()">🚀 Згенерувати звіт</button>
+                <button class="btn copy-btn" onclick="copyToClipboard()">📋 Копіювати звіт</button>
+            </div>
+
+            <div id="output" class="output">
+                <div style="text-align: center; color: #6c757d; margin: 50px 0;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">📝</div>
+                    <h3>Готово до створення звіту!</h3>
+                    <p>Оберіть рівень, додайте студентів, виберіть теми та згенеруйте професійний звіт</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let studentCount = 0;
+        let currentStudentId = null;
+        let reportData = [];
+        let selectedLevel = null;
+
+        // Templates data organized by level
+        const templatesData = {
+            A1: {
+                grammar: [
+                    'Question words — asking for information ❓',
+                    'How questions — asking "how" things happen 🤔',
+                    'To be affirmative — is/am/are in positive form ✅',
+                    'To be negative — isn\'t/aren\'t ❌',
+                    'To be interrogative — asking questions with "be" ❓',
+                    'Present simple affirmative — do/does for routines 🕒',
+                    'Present simple negative — don\'t/doesn\'t 🚫',
+                    'Do you questions — asking using "do" 🤨',
+                    'Yes / no answers — short answers ✔️❌',
+                    'Have / has — talking about possession 👜',
+                    'Ordinal numerals — first, second, third... 🔢',
+                    'Future simple affirmative — will for future plans 🔮',
+                    'Future simple negative — won\'t for future negation 🚫🔮',
+                    'Will / won\'t — making future statements 📅',
+                    'Prepositions of time — in/on/at for time ⏰',
+                    'Prepositions of place — in/on/under for location 📍',
+                    'Would like — polite requests 🍵',
+                    'Common verbs — everyday action words 🏃‍♂️',
+                    'Common adjectives — describing words 😊',
+                    'Common nouns — everyday objects 🛋',
+                    'Get + adjectives — changes in feeling/state 😃➡️😔',
+                    'Imperatives — giving commands or advice 📢',
+                    'Countable/uncountable nouns — apples vs water 🍎💧',
+                    'Much / many — quantities with nouns 🔢',
+                    'Plural forms — more than one 🐱➡️🐱🐱',
+                    'Articles — a/an/the 📄',
+                    'Few / little — small quantities 📉',
+                    'Modal can — ability or permission 🎯',
+                    'Should for advice — recommendations 💡',
+                    'Must for obligation — rules or necessity 📜',
+                    'There is / are — describing existence 🏠',
+                    'This / that / these / those — pointing to things 👉',
+                    'Pronouns — replacing nouns 🧍➡️he/she/it',
+                    'Possessives — showing ownership 🖐',
+                    'Relative clause — who/which/where 🔗',
+                    'Conjunctions — and/but/because ➕➖',
+                    'Let\'s for suggestions — inviting action 🙌',
+                    'Was / were — past form of be 🕰',
+                    'Some / any — talking about quantity 🍪',
+                    'Preposition "to" — showing direction ➡️',
+                    'Here / there — location words 📍',
+                    'Like + ing — hobbies and preferences 🎨',
+                    'Could you — polite requests 🙏',
+                    'Telling time — saying hours and minutes ⏰',
+                    'Telling dates — day/month/year 📅',
+                    'Telling numbers — counting and reading numbers 🔢',
+                    'Very vs really — degree of intensity 🔥',
+                    'Spelling — writing words correctly ✏️',
+                    'Present continuous affirmative — actions now 🏃',
+                    'Present continuous negative — not happening now 🚫🏃'
+                ],
+                vocabulary: [
+                    'Introducing Yourself & Talking About Others — names, age, and personal info 🙋‍♂️🗣',
+                    'Work, Jobs & Daily Routines — occupations and everyday actions 💼⏰',
+                    'Food, Drinks & Meals — eating, drinking, and meal times 🍎🥤',
+                    'Shopping & Prices — buying things and costs 🛒💰',
+                    'Family & Relationships — relatives and connections 👨‍👩‍👧‍👦❤️',
+                    'The Home & Everyday Objects — rooms and daily items 🏠🪑',
+                    'Telling the Time & Days of the Week — clocks and calendars ⏲📅',
+                    'Weather & Seasons — sun, rain, cold, and more ☀️❄️',
+                    'Clothes & Colours — what we wear and color names 👕🌈',
+                    'Health & Going to the Doctor — feeling sick and treatment 🤒🩺',
+                    'Transport & Directions — getting around and asking the way 🚗🧭',
+                    'Hobbies, Sports & Free Time — fun activities and interests ⚽🎨',
+                    'Places in Town & Public Services — city locations and help 🏪🏥',
+                    'Talking About the Past — saying what happened before 🕰📆',
+                    'Making Plans — saying what will happen soon 🗓🔜',
+                    'Describing People — looks and personality 👩🧠',
+                    'Describing Places — where things are and what they like 🏞🏙',
+                    'Using the Phone & Sending Messages — communication tools 📱✉️',
+                    'Going to Restaurants & Cafés — ordering food and drinks 🍽☕',
+                    'Basic Feelings & Emotions — happy, sad, angry, etc. 😊😠'
+                ]
+            },
+            A2: {
+                grammar: [
+                    'Question words — asking for information ❓',
+                    'How questions — asking "how" things happen 🤔',
+                    'Subject and object questions — identifying subject or object in questions (Who called? / Who did you call?) 📞',
+                    'Adverbs of frequency — how often something happens (always, often, never) 🔄',
+                    'Present simple — habits, routines, facts 🕒',
+                    'Past simple — completed actions in the past ⏳',
+                    'Future simple — will for future plans 🔮',
+                    'Simple tenses — present, past, and future basic forms 📅',
+                    'Present continuous — actions happening now 🏃',
+                    'Present continuous for future — planned future events 📆',
+                    'Past continuous — actions in progress in the past 🕰',
+                    'Present perfect — experiences and results up to now ✔️',
+                    'Time markers — words showing when (yesterday, just, already) ⏰',
+                    'Auxiliary verbs — helping verbs (do, be, have) 🛠',
+                    'Prepositions of time — in/on/at for time ⏳',
+                    'Prepositions of place — in/on/under for location 📍',
+                    'Adjectives and prepositions — tired of / interested in 😌➡️📚',
+                    'Verbs and prepositions — depend on / focus on 🔗',
+                    'Comparatives — comparing two things (bigger, faster) ⚖️',
+                    'Superlatives — the highest degree (the biggest) 🏆',
+                    'Be going to — future intentions and plans 📋',
+                    'Would like — polite requests and wishes 🙏',
+                    'So / such — emphasis in sentences 💪',
+                    'Too / enough — expressing excess or sufficiency ⚖️',
+                    'Some / any / no — talking about quantity 🍪',
+                    'No + derivatives — nothing, nobody, nowhere 🚫',
+                    'Get + adjectives — changes in feeling/state 😃➡️😔',
+                    'Imperatives — giving commands or advice 📢',
+                    'Countable / uncountable nouns — apples vs water 🍎💧',
+                    'Much / many — quantities with nouns 🔢',
+                    'Plural exceptions — irregular plural forms 🐭➡️🐭🐭',
+                    'Few / little — small quantities 📉',
+                    'Quantifiers — few/a few, little/a little 📊',
+                    'Modals can / could — ability and possibility 🎯',
+                    'Should for advice — giving recommendations 💡',
+                    'Must for obligation — rules or necessity 📜',
+                    'Have to — expressing necessity 🏷',
+                    'Zero conditional — general truths 🌍',
+                    'First conditional — possible future situations 🌤',
+                    'There is / are — describing existence 🏠',
+                    'There was / were — past existence 🕰',
+                    'This / that / these / those — pointing to things 👉',
+                    'Possessives — showing ownership (my/mine) 🖐',
+                    'Relative clause — who/which/where 🔗',
+                    'Phrasal verbs — verb + particle (look after) 🔄',
+                    'Expressing numbers — years, sums, decimals, fractions 🔢',
+                    'Conjunctions — and/but/because ➕➖',
+                    'Let\'s for suggestions — inviting action 🙌',
+                    'Be like — asking for description (What is it like?) 🌦',
+                    'Adjectives with -ing/-ed — describing feelings and qualities 😴/😴-ing'
+                ],
+                vocabulary: [
+                    'Daily Life & Time Management — planning and routines 📅🕒',
+                    'Work, Jobs & Career Plans — jobs now and in the future 👨‍🔧📈',
+                    'Money, Banking & Budgeting — saving, spending, and banks 💸🏦',
+                    'Food, Cooking & Eating Out — meals, recipes, and dining experiences 🍽🍳',
+                    'Relationships & Social Life — friends, dates, and events 👫🎉',
+                    'Travel, Holidays & Booking Trips — planning trips and vacations ✈️🏖',
+                    'Health, Illness & Going to the Doctor — sickness and wellness 🏥💊',
+                    'Weather & Planning Activities — forecast and outdoor plans 🌦📆',
+                    'Home Life, Renting & Household Items — living spaces and furniture 🛋🏡',
+                    'Learning & Personal Development — studying and self-growth 📚🧠',
+                    'Getting Around the City — transport and navigation 🚎🗺',
+                    'Style, Clothes & Shopping Habits — fashion choices and buying behavior 👗🛍',
+                    'Feelings, Stress & Well-being — mood and mental health 😟💆',
+                    'Leisure, Hobbies & Free-Time Activities — relaxing and having fun 🎮🎸',
+                    'Technology in Everyday Life — gadgets and internet use 📱💻',
+                    'Services & Places in the Community — libraries, post offices, etc. 🏣📬',
+                    'Countries, Cultures & Languages — the world and its people 🌍🗣',
+                    'Time, Appointments & Schedules — setting and keeping plans 📆🕘',
+                    'Nature, Environment & Green Living — eco habits and outdoors 🌿♻️',
+                    'Describing People, Places & Experiences — talking about life 🧍🏞📝'
+                ]
+            },
+            B1: {
+                grammar: [
+                    'Question words — asking for information ❓',
+                    'Subject and object questions — identifying subject or object (Who called? / Who did you call?) 📞',
+                    'Adverbs of frequency — how often something happens 🔄',
+                    'Present simple — habits, routines, facts 🕒',
+                    'Past simple — completed past actions ⏳',
+                    'Future simple — will for future plans 🔮',
+                    'Simple tenses — present, past, future basic forms 📅',
+                    'Present continuous — actions happening now 🏃',
+                    'Present continuous for future — planned future events 📆',
+                    'Past continuous — actions in progress in the past 🕰',
+                    'Past simple / Past continuous — contrasting finished and ongoing past actions 📜',
+                    'Present perfect — experiences and results ✔️',
+                    'Present perfect continuous — actions continuing until now ⏳',
+                    'Present perfect / Past simple — difference between past and up-to-now actions 🔍',
+                    'Present perfect / Present perfect continuous — result vs duration ⏱',
+                    'Time markers — words showing when (yesterday, just, already) ⏰',
+                    'Auxiliary verbs — helping verbs (do, be, have) 🛠',
+                    'Prepositions of time — in/on/at for time ⏳',
+                    'Prepositions of place — in/on/under for location 📍',
+                    'Adjectives and prepositions — tired of / interested in 😌➡️📚',
+                    'Verbs and prepositions — depend on / focus on 🔗',
+                    'Comparatives — comparing two things ⚖️',
+                    'Superlatives — the highest degree 🏆',
+                    'Be going to — future intentions 📋',
+                    'Will / be going to — future forms 🔮',
+                    'Would like / Be like / Feel like — polite requests, descriptions, desires 🙏',
+                    'So / such — emphasis 💪',
+                    'Too / enough — excess or sufficiency ⚖️',
+                    'Some / any / no — talking about quantity 🍪',
+                    'No + derivatives — nothing, nobody, nowhere 🚫',
+                    'Get + adjectives — changes in state 😃➡️😔',
+                    'Imperatives — commands or advice 📢',
+                    'Much / many — quantities 🔢',
+                    'Plural exceptions — irregular plural forms 🐭➡️🐭🐭',
+                    'Few / little — small amounts 📉',
+                    'Quantifiers — few/a few, little/a little 📊',
+                    'Modals can / could / should / must / have to — ability, advice, obligation 🎯',
+                    'Zero conditional — general truths 🌍',
+                    'First conditional — possible future situations 🌤',
+                    'Second conditional — imaginary situations 💭',
+                    'Conditionals 0–2 — all types together 📚',
+                    'There is / are / was / were — describing existence 🏠',
+                    'This / that / these / those — pointing to things 👉',
+                    'Possessives — my/mine, your/yours 🖐',
+                    'Relative clause — who/which/where 🔗',
+                    'Phrasal verbs — verb + particle (look after) 🔄',
+                    'Expressing numbers — years, sums, decimals, fractions 🔢',
+                    'Conjunctions — and/but/because/moreover ➕➖',
+                    'Let\'s for suggestions — inviting action 🙌',
+                    'Adjectives with -ing/-ed — describing feelings and qualities 😴',
+                    'Used to + V — past habits or states 🕰',
+                    'Be used to + Ving — being familiar with something 🔄',
+                    'Get used to + Ving — becoming familiar with something 🛠',
+                    'Used to / Be used to / Get used to — differences explained 🔍',
+                    'Reported speech present simple — shifting to past tense 🗣',
+                    'Reported speech future simple — will → would 🔮',
+                    'Reported speech simple tenses — changes in tense 📝',
+                    'Gerund / infinitive — verb forms after certain verbs 📖',
+                    'Articles — a/an, the, zero article 📚',
+                    'Either…or / Neither…nor / Both…and — combining ideas 🔗',
+                    'Question tags to be — isn\'t it?, aren\'t they? ❓',
+                    'Question tags simple tenses — do you?, didn\'t they? ❓',
+                    'Question tags mixed — variety of forms 🎯',
+                    'During / for / while — time expressions 🕒',
+                    'Reflexive pronouns — myself, yourself, ourselves 🙋'
+                ],
+                vocabulary: [
+                    'Workplace Communication & Office Life — emails, meetings, and tasks 🖥📤',
+                    'Careers, CVs & Job Interviews — applying for jobs and career steps 📄🎙',
+                    'Money, Banking & Financial Decisions — money matters and saving 🏦💳',
+                    'Food Culture, Diets & Healthy Eating — nutrition and eating habits 🥗🥑',
+                    'Travel Planning & Tourist Experiences — booking and sightseeing 🧳🗺',
+                    'Health, Fitness & Medical Appointments — staying fit and visiting the doctor 🏃‍♂️🩺',
+                    'Housing, Renting & Moving Home — homes and moving process 🏘📦',
+                    'Shopping Habits & Consumer Choices — buying patterns and preferences 🛍📊',
+                    'Technology, Devices & Online Life — apps, devices, and screens 📲🖱',
+                    'Media, News & Social Networks — news and social media 📰📱',
+                    'Time Management & Daily Schedules — planning and time use ⌛📋',
+                    'Dealing with Problems & Complaints — fixing issues and asking for help 😤📞',
+                    'Relationships, Social Events & Small Talk — chatting and mingling 🗣🥂',
+                    'Personal Goals, Habits & Self-Improvement — motivation and routines 🎯📈',
+                    'Sustainability, Nature & Environmental Issues — eco topics and awareness 🌎♻️',
+                    'Cultural Differences & International Living — life in other cultures 🌐🌏',
+                    'Describing Trends, Graphs & Changes — interpreting data 📊🔺',
+                    'Talking About Experiences & Telling Stories — sharing memories 📖🗣',
+                    'Feelings, Mental Health & Stress Management — emotions and well-being 😌🧘',
+                    'Politics, Society & Civic Life — basic public issues 🏛🗳'
+                ]
+            },
+            B2: {
+                grammar: [
+                    'Present tenses — present simple, continuous, perfect, perfect continuous 🕒',
+                    'Past tenses — past simple, continuous, perfect, perfect continuous ⏳',
+                    'Future tenses — future simple, continuous, perfect, perfect continuous 🔮',
+                    '12 tenses — all main English tense forms 📅',
+                    'Time markers — words showing when (ago, since, yet) ⏰',
+                    'Passive voice simple tenses — focus on object, not subject 🛠',
+                    'Passive voice modals — can be done, must be finished 🗝',
+                    'Passive voice perfect tenses — has been completed 📜',
+                    'Active vs passive voice — subject focus vs object focus 🔄',
+                    'Reported speech — saying what someone said 🗣',
+                    'Reported questions yes/no — if/whether questions ❓',
+                    'Reported questions wh- — who, where, what, why in reported speech 📖',
+                    'Order of adjectives — opinion, size, age, color, origin, material, purpose 🎨',
+                    'So / such / too / enough — emphasis and quantity 💪',
+                    'Fixed expressions — common phrases with fixed wording 📌',
+                    'Idioms — figurative language 🌟',
+                    'Modal verbs — can, could, should, must 🎯',
+                    'Modals in the past — must have done, could have gone 📜',
+                    'Most / most of / the most — quantity and superlative forms 📊',
+                    'Comparative adjectives — comparing two things ⚖️',
+                    'Negative prefixes — un-, in-, dis-, im- 🚫',
+                    'Stative verbs — describe states, not actions 🛑',
+                    'Future in the past — would, was going to 📅',
+                    'Will vs be going to — different future meanings 🔍',
+                    'Present tenses for future — using present for scheduled events 📆',
+                    'Conditionals 0-3 — all four main types of conditionals 🔄',
+                    'Mixed conditionals — combining different time references ♻️',
+                    'Prepositions of time/place/movement — in/on/at, to/from/into 📍',
+                    'Auxiliary emphasis — I do believe, he does know 🎤',
+                    'Possessives — my/mine, your/yours 🖐',
+                    'Articles — a/an, the, zero article 📚',
+                    'Some/any/no/every + derivatives — somebody, anywhere, nothing 🌍',
+                    'Either/neither/both — combining and contrasting options 🔗',
+                    'Verbs and prepositions — depend on, look at 🔑',
+                    'Adjectives and prepositions — interested in, good at 📌',
+                    'Relative clause — who, which, that 🔍',
+                    'Adjectives with -ing/-ed — interesting vs interested 😴',
+                    'Gerund/infinitive — using -ing or to + verb 📝',
+                    'Plural exceptions — irregular plural nouns 🐭➡️🐭🐭',
+                    'Quantifiers — few/a few, little/a little 📊',
+                    'Phrasal verbs — turn on, look after, give up 🔄',
+                    'I wish / if only — expressing regrets and wishes 💭',
+                    'Get / be used to — becoming or being accustomed 🛠',
+                    'Used to — past habits or states ⏳',
+                    'It\'s time + past simple — suggesting action now ⏰',
+                    'Would rather — preference structure 🙋',
+                    'Auxiliary verbs — do, be, have as helpers 🛠',
+                    'Word formation — prefixes, suffixes, root changes 🏗',
+                    'Linking words — despite, although, however 🔗',
+                    'Stress and intonation — pronunciation emphasis 🎙',
+                    'Compound adjectives — two words as one (well-known) 📝',
+                    'Causative — have/get something done 🛠',
+                    'Impersonal passive — it is said that… 🗣',
+                    'Question tags — isn\'t it?, don\'t you? ❓',
+                    'Be about to — be ready to do something ⏳',
+                    'Cannot but — can\'t help doing something 📜',
+                    'The… the… comparative structure — the more, the better 📈',
+                    'Abbreviations — shortened forms like etc., USA ✂️',
+                    'Like phrases — feel like, what\'s… like, be like 🎯',
+                    'Confusing words — homonyms, homophones, tricky spelling 🔍'
+                ],
+                vocabulary: [
+                    'Professional Communication & Workplace Dynamics — effective work talk 💬👥',
+                    'Career Development, Leadership & Entrepreneurship — growing in work 💼🚀',
+                    'Personal Finance, Investing & Economic Trends — money growth and markets 📈💰',
+                    'Global Travel, Cultural Awareness & Responsible Tourism — exploring wisely 🌍🧳',
+                    'Nutrition, Fitness & Long-Term Health — healthy lifestyle choices 🥦🏋️‍♀️',
+                    'Housing Market, Interior Design & Real Estate — homes and design 🏘🛋',
+                    'Consumer Behavior, Advertising & Brand Loyalty — shopping and ads 📺🛍',
+                    'Technology, Innovation & Digital Security — tech trends and safety 💻🔒',
+                    'News, Media Literacy & Public Opinion — facts vs opinions 🗞🧠',
+                    'Work-Life Balance, Time Pressure & Productivity — managing time and stress 🕒📉',
+                    'Dealing with Conflict, Complaints & Negotiation — solving work or life issues 🤝📞',
+                    'Social Relationships, Networking & Emotional Intelligence — connecting with people 🤗💬',
+                    'Lifelong Learning, Online Education & Skill Building — learning anytime 📚🧑‍🏫',
+                    'Environmental Issues, Sustainability & Climate Change — saving the planet 🌡🌱',
+                    'Cultural Identity, Traditions & Global Citizenship — who we are and the world 🌐🎎',
+                    'Data, Statistics & Describing Trends — analyzing numbers 📉📊',
+                    'Telling Stories, Giving Opinions & Debating Ideas — speaking up 💭🗨',
+                    'Mental Health, Stress & Personal Growth — emotional self-care 🧠❤️',
+                    'Law, Rights & Responsibilities in Society — simple legal matters ⚖️📜',
+                    'Politics, Democracy & Global Issues — world leadership topics 🏛🌍'
+                ]
+            },
+            C1: {
+                grammar: [
+                    '12 grammar tenses — all main English tenses 📅',
+                    'Time markers — words showing when (ago, since, yet) ⏰',
+                    'Future in the past — would, was going to 📜',
+                    'Present tenses for future — using present for scheduled events 📆',
+                    'Passive voice — focus on object, not subject 🛠',
+                    'Impersonal passive — it is said that… 🗣',
+                    'Reporting with passive verbs — It is believed, He is thought 📰',
+                    'Causative — have/get something done 🔧',
+                    'Modals — can, could, should, must 🎯',
+                    'Modals in the past — must have + V3, could have + V3 📜',
+                    'Conditionals 0/1/2/3 — real and unreal situations 🔄',
+                    'Mixed conditionals — 2+3, 3+2 combinations ♻️',
+                    'Adding emphasis — auxiliary verbs (I do believe) 🎤',
+                    'Adding emphasis — inversions (Never have I seen…) 🔄',
+                    'Negative prefixes — un-, in-, dis-, im- 🚫',
+                    'Word formation — prefixes, suffixes, root changes 🏗',
+                    'Punctuation — commas, colons, quotation marks ✒️',
+                    'Past participle as adjective — skills required, money spent 📝',
+                    'Adjectives vs adverbs — correct use + exceptions (hard, hardly) 🎯',
+                    'Linking words — despite, whereas, although 🔗',
+                    'Confusing words — homonyms, tricky spelling 🔍',
+                    'Gerund / infinitive — using -ing or to + verb 📝',
+                    'Stative verbs — states, not actions + exceptions (be, have) 🛑',
+                    'If + past participle — if needed, if required ⚡',
+                    'Reported statements — He said he was tired 🗣',
+                    'Reported questions — yes/no and wh- formats ❓',
+                    'Sequence of tenses — tense harmony in reported speech ⏳',
+                    'Non-finite clauses — located in…, being born in… 🏠',
+                    'Negative non-finite clauses — not knowing…, not having seen… 🚫',
+                    'Either / neither / both — combining or contrasting 🔗',
+                    'Quantity determiners — many, much, a lot of 📊',
+                    'Contrasting words — despite, whereas, although ⚖️',
+                    'Plural forms exceptions — irregular plurals 🐭➡️🐭🐭',
+                    'Articles — a/an, the, zero article 📚',
+                    'Adjectives as nouns — the rich, the poor 👑',
+                    'Be used to / get used to / used to / would — habits and adaptation 🔄',
+                    'Reflexive pronouns / relative pronouns — myself, who, which 📌',
+                    'Be to + infinitive — formal future meaning 📜',
+                    'Position of adjectives — order before nouns 📝',
+                    'Negative questions — Isn\'t it?, Don\'t you? ❓',
+                    'Prepositions of time and place — in/on/at 📍',
+                    'Adjectives + prepositions — interested in, good at 📌',
+                    'Verbs + prepositions — depend on, look at 🔑',
+                    'Quantifiers — few, a few, little, a little 📊',
+                    'All (of), whole, every, each — quantity differences 📏',
+                    'I wish / if only — expressing regrets 💭',
+                    'Would rather / had better — giving advice or preference 🙋',
+                    'Bare infinitive — make, let, help without to 🛠',
+                    'Complex object — I want you to do something 🧩',
+                    'See sb do / doing — different meanings of perception verbs 👀',
+                    'Phrasal verbs — turn on, look after 🔄',
+                    'The more… the better — comparative structure 📈',
+                    'Can\'t help — can\'t stop doing something ♻️',
+                    'Like phrases — seem like, look like, feel like 🎯',
+                    'Dare — as a modal and regular verb ⚡'
+                ],
+                vocabulary: [
+                    'Advanced Business Communication & Leadership Styles — high-level business talk 🧑‍💼📢',
+                    'Global Economics, Finance & Market Forces — world money matters 💹🌎',
+                    'Innovation, Technology & the Future of Work — what\'s next in tech 🤖🔮',
+                    'Cultural Intelligence & Intercultural Communication — smart global interaction 🌐🗣',
+                    'Ethics, Corporate Responsibility & Sustainable Business — doing business right ⚖️💼',
+                    'Politics, Power Structures & Global Governance — how nations are run 🏛🌐',
+                    'Psychology, Human Behavior & Decision-Making — how minds work 🧠🤔',
+                    'Science, Research & Technological Breakthroughs — cutting-edge discoveries 🔬🚀',
+                    'Health Systems, Public Policy & Global Health Issues — health on a big scale 🏥🌍',
+                    'Philosophy, Critical Thinking & Ethical Dilemmas — deep thoughts and logic 🧘‍♂️📚',
+                    'Law, Justice & Civil Liberties — systems of fairness ⚖️🗽',
+                    'Media Bias, Freedom of Speech & Influence of Social Media — media power and rights 📰📣',
+                    'Climate Change, Environmental Policy & Global Action — fighting for the planet 🌍🌡',
+                    'Education Systems, Equity & Lifelong Learning — learning fairly for life 📖🎓',
+                    'Urban Development, Architecture & Public Spaces — cities and design 🏙🏗',
+                    'Identity, Migration & Social Integration — people and movement 🌏👫',
+                    'Literature, Art & Cultural Commentary — creative expressions 📚🎭',
+                    'Negotiation, Diplomacy & Conflict Resolution — solving serious issues 🕊🤝',
+                    'Artificial Intelligence, Privacy & Digital Ethics — future tech and its rules 🤖🔐',
+                    'Public Speaking, Persuasion & Argumentation Techniques — speaking with impact 🎤🗨'
+                ]
+            }
+        };
+
+        // Встановлюємо поточний місяць та додаємо першого студента
+        window.onload = function() {
+            const currentMonth = new Date().toLocaleString('en-US', { month: 'long' });
+            document.getElementById('month').value = currentMonth;
+            addStudent();
+            updateStats();
+        };
+
+        function selectLevel(level) {
+            selectedLevel = level;
+            
+            // Update level buttons
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update current level display
+            const levelDisplay = document.getElementById('current-level-display');
+            const levelNames = {
+                'A1': '📚 A1 - Beginner',
+                'A2': '📖 A2 - Elementary', 
+                'B1': '📘 B1 - Intermediate',
+                'B2': '📗 B2 - Upper-Intermediate',
+                'C1': '📕 C1 - Advanced'
+            };
+            
+            // Show templates section
+            const templatesSection = document.getElementById('templates-section');
+            templatesSection.classList.add('show');
+            
+            // Load templates for selected level
+            loadTemplatesForLevel(level);
+            
+            showNotification(`✅ Обрано рівень ${level}! Шаблони завантажено.`, 'success');
+        }
+
+        function loadTemplatesForLevel(level) {
+            const templatesContent = document.getElementById('templates-content');
+            const data = templatesData[level];
+            
+            if (!data) return;
+            
+            let html = `
+                <div class="level-header" id="level-header">📚 ${level} LEVEL TEMPLATES</div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h6 style="color: #007bff; font-weight: 600; margin-bottom: 10px;">🔤 ГРАМАТИЧНІ ШАБЛОНИ:</h6>
+            `;
+            
+            data.grammar.forEach(template => {
+                html += `<button class="template-btn grammar" onclick="addTemplate('grammar', '${template.replace(/'/g, "\\'")}')">${template.split(' — ')[0]}</button>`;
+            });
+            
+            html += `
+                </div>
+                
+                <div>
+                    <h6 style="color: #17a2b8; font-weight: 600; margin-bottom: 10px;">📚 ЛЕКСИЧНІ ШАБЛОНИ:</h6>
+            `;
+            
+            data.vocabulary.forEach(template => {
+                html += `<button class="template-btn vocabulary" onclick="addTemplate('vocabulary', '${template.replace(/'/g, "\\'")}')">${template.split(' — ')[0]}</button>`;
+            });
+            
+            html += '</div>';
+            
+            templatesContent.innerHTML = html;
+			updateLevelHeader();
+        }
+
+        function addStudent() {
+            const container = document.getElementById('students-container');
+            const studentDiv = document.createElement('div');
+            studentDiv.className = 'student-card';
+            studentDiv.setAttribute('data-student', studentCount);
+            
+            studentDiv.innerHTML = `
+                <div class="student-header">
+                    <div class="student-name">
+                        <input type="text" placeholder="👤 Ім'я студента" class="student-name-input" onchange="updateStats(); updateLevelHeader();" oninput="updateLevelHeader();">
+                    </div>
+                    <button class="remove-student" onclick="removeStudent(${studentCount})" style="display: ${studentCount > 0 ? 'block' : 'none'}">❌ Видалити</button>
+                </div>
+                
+                <div class="topics-section">
+                    <div class="topics-header">
+                        <h4>📝 Граматичні теми</h4>
+                        <button class="add-topic-btn" onclick="addTopic(${studentCount}, 'grammar')">+ Додати</button>
+                    </div>
+                    <div class="grammar-topics" data-student="${studentCount}"></div>
+                </div>
+                
+                <div class="topics-section">
+                    <div class="topics-header">
+                        <h4>📚 Лексичні теми</h4>
+                        <button class="add-topic-btn" onclick="addTopic(${studentCount}, 'vocabulary')">+ Додати</button>
+                    </div>
+                    <div class="vocabulary-topics" data-student="${studentCount}"></div>
+                </div>
+                
+                <div class="topics-section">
+                    <div class="topics-header">
+                        <h4>🎯 Навички та досягнення</h4>
+                        <button class="add-topic-btn" onclick="addTopic(${studentCount}, 'skills')">+ Додати</button>
+                    </div>
+                    <div class="skills-topics" data-student="${studentCount}"></div>
+                </div>
+                
+                <div class="topics-section">
+                    <div class="topics-header">
+                        <h4>📈 Рекомендації для покращення</h4>
+                        <button class="add-topic-btn" onclick="addTopic(${studentCount}, 'recommendations')">+ Додати</button>
+                    </div>
+                    <div class="recommendations-topics" data-student="${studentCount}"></div>
+                </div>
+            `;
+            
+            container.appendChild(studentDiv);
+            studentCount++;
+            
+            // Встановлюємо цього студента як поточного
+            currentStudentId = studentCount - 1;
+            updateActiveStudent();
+            updateRemoveButtons();
+            updateStats();
+            animateProgress();
+        }
+
+        function removeStudent(studentId) {
+            const studentElement = document.querySelector(`[data-student="${studentId}"]`);
+            if (studentElement) {
+                studentElement.style.animation = 'slideOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                    studentElement.remove();
+                    updateRemoveButtons();
+                    updateStats();
+                    animateProgress();
+                }, 300);
+            }
+        }
+
+        function updateRemoveButtons() {
+            const students = document.querySelectorAll('.student-card');
+            students.forEach((student, index) => {
+                const removeBtn = student.querySelector('.remove-student');
+                removeBtn.style.display = students.length > 1 ? 'block' : 'none';
+            });
+        }
+
+        function addTopic(studentId, type) {
+            const container = document.querySelector(`[data-student="${studentId}"] .${type}-topics`);
+            const topicDiv = document.createElement('div');
+            topicDiv.className = 'topic-item';
+            
+            let placeholder = '';
+            switch(type) {
+                case 'grammar': placeholder = '📝 Граматична тема — детальний опис'; break;
+                case 'vocabulary': placeholder = '📚 Лексична тема — опис з прикладами 🎯'; break;
+                case 'skills': placeholder = '🎯 Навичка або досягнення студента'; break;
+                case 'recommendations': placeholder = '📈 Рекомендація для покращення'; break;
+            }
+            
+            topicDiv.innerHTML = `
+                <input type="text" placeholder="${placeholder}" onchange="updateStats()">
+                <button class="remove-topic" onclick="removeTopic(this)">×</button>
+            `;
+            
+            container.appendChild(topicDiv);
+            updateStats();
+            animateProgress();
+        }
+
+        function removeTopic(button) {
+            const topicItem = button.parentElement;
+            topicItem.style.animation = 'slideOut 0.3s ease-out forwards';
+            setTimeout(() => {
+                topicItem.remove();
+                updateStats();
+                animateProgress();
+            }, 300);
+        }
+
+        function addTemplate(type, text) {
+            if (currentStudentId === null) {
+                alert('🚨 Спочатку оберіть студента! Клікніть на картку студента.');
+                return;
+            }
+            
+            const container = document.querySelector(`[data-student="${currentStudentId}"] .${type}-topics`);
+            const topicDiv = document.createElement('div');
+            topicDiv.className = 'topic-item';
+            
+            topicDiv.innerHTML = `
+                <input type="text" value="${text}" onchange="updateStats()">
+                <button class="remove-topic" onclick="removeTopic(this)">×</button>
+            `;
+            
+            container.appendChild(topicDiv);
+            
+            // Анімація успішного додавання
+            topicDiv.style.background = 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)';
+            topicDiv.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                topicDiv.style.background = '';
+                topicDiv.style.transform = 'scale(1)';
+            }, 1500);
+            
+            updateStats();
+            animateProgress();
+            
+            // Показуємо сповіщення
+            showNotification('✅ Тему додано!', 'success');
+        }
+
+		function updateActiveStudent() {
+			document.querySelectorAll('.student-card').forEach(card => {
+				card.classList.remove('active');
+			});
+			
+			if (currentStudentId !== null) {
+				const activeCard = document.querySelector(`[data-student="${currentStudentId}"]`);
+				if (activeCard) {
+					activeCard.classList.add('active');
+				}
+			}
+			
+			updateLevelHeader(); // ← ДОДАТИ ЦЕЙ РЯДОК
+		}
+		
+		function updateLevelHeader() {
+    const levelHeader = document.getElementById('level-header');
+    if (!levelHeader || !selectedLevel) return;
+    
+    let headerText = `📚 ${selectedLevel} LEVEL TEMPLATES`;
+    
+    if (currentStudentId !== null) {
+        const activeCard = document.querySelector(`[data-student="${currentStudentId}"]`);
+        if (activeCard) {
+            const nameInput = activeCard.querySelector('.student-name-input');
+            const studentName = nameInput.value.trim();
+            
+            if (studentName) {
+                headerText = `📚 ${selectedLevel} LEVEL TEMPLATES — 👤 ${studentName.toUpperCase()}`;
+            } else {
+                headerText = `📚 ${selectedLevel} LEVEL TEMPLATES — 👤 СТУДЕНТ ${currentStudentId + 1}`;
+            }
+        }
+    }
+    
+    levelHeader.textContent = headerText;
+}
+
+        // Встановлюємо активного студента при кліку
+        document.addEventListener('click', function(e) {
+            const studentCard = e.target.closest('.student-card');
+            if (studentCard) {
+                currentStudentId = parseInt(studentCard.getAttribute('data-student'));
+                updateActiveStudent();
+            }
+        });
+
+        function updateStats() {
+            const students = document.querySelectorAll('.student-card');
+            const grammarTopics = document.querySelectorAll('.grammar-topics .topic-item input');
+            const vocabularyTopics = document.querySelectorAll('.vocabulary-topics .topic-item input');
+            
+            let filledInputs = 0;
+            let totalInputs = 0;
+            
+            document.querySelectorAll('.student-card input').forEach(input => {
+                totalInputs++;
+                if (input.value.trim()) filledInputs++;
+            });
+            
+            const completion = totalInputs > 0 ? Math.round((filledInputs / totalInputs) * 100) : 0;
+            
+            document.getElementById('students-count').textContent = students.length;
+            document.getElementById('grammar-count').textContent = grammarTopics.length;
+            document.getElementById('vocabulary-count').textContent = vocabularyTopics.length;
+            //document.getElementById('completion-percent').textContent = completion + '%';
+        }
+
+        function animateProgress() {
+            setTimeout(() => {
+                const students = document.querySelectorAll('.student-card');
+                let filledInputs = 0;
+                let totalInputs = 0;
+                
+                document.querySelectorAll('.student-card input').forEach(input => {
+                    totalInputs++;
+                    if (input.value.trim()) filledInputs++;
+                });
+                
+                const completion = totalInputs > 0 ? (filledInputs / totalInputs) * 100 : 0;
+                //document.getElementById('progress-fill').style.width = completion + '%';
+            }, 100);
+        }
+
+        function generateReport() {
+            const month = document.getElementById('month').value;
+            const students = document.querySelectorAll('.student-card');
+            
+            if (students.length === 0) {
+                showNotification('⚠️ Додайте хоча б одного студента!', 'error');
+                return;
+            }
+            
+            let report = `${month.toUpperCase()} ENGLISH LEARNING REPORT 📚✨\n`;
+            report += `${'='.repeat(50)}\n\n`;
+            
+            reportData = []; // Очищуємо попередні дані
+            
+            students.forEach((student, index) => {
+                const nameInput = student.querySelector('.student-name-input');
+                const studentName = nameInput.value.trim() || `Student ${index + 1}`;
+                
+                const studentData = { name: studentName, sections: {} };
+                
+                report += `🌟 ${studentName.toUpperCase()}\n`;
+                report += `${'-'.repeat(30)}\n`;
+                
+                // Граматичні теми
+                const grammarInputs = student.querySelectorAll('.grammar-topics .topic-item input');
+                const grammarTopics = Array.from(grammarInputs)
+                    .map(input => input.value.trim())
+                    .filter(value => value);
+                
+                if (grammarTopics.length > 0) {
+                    report += `\n📝 GRAMMAR TOPICS MASTERED:\n`;
+                    grammarTopics.forEach((topic, i) => {
+                        report += `   ${i + 1}. ${topic}\n`;
+                    });
+                    studentData.sections.grammar = grammarTopics;
+                }
+                
+                // Лексичні теми
+                const vocabularyInputs = student.querySelectorAll('.vocabulary-topics .topic-item input');
+                const vocabularyTopics = Array.from(vocabularyInputs)
+                    .map(input => input.value.trim())
+                    .filter(value => value);
+                
+                if (vocabularyTopics.length > 0) {
+                    report += `\n📚 VOCABULARY THEMES EXPLORED:\n`;
+                    vocabularyTopics.forEach((topic, i) => {
+                        report += `   ${i + 1}. ${topic}\n`;
+                    });
+                    studentData.sections.vocabulary = vocabularyTopics;
+                }
+                
+                // Навички та досягнення
+                const skillsInputs = student.querySelectorAll('.skills-topics .topic-item input');
+                const skillsTopics = Array.from(skillsInputs)
+                    .map(input => input.value.trim())
+                    .filter(value => value);
+                
+                if (skillsTopics.length > 0) {
+                    report += `\n🎯 SKILLS & ACHIEVEMENTS:\n`;
+                    skillsTopics.forEach((topic, i) => {
+                        report += `   ✅ ${topic}\n`;
+                    });
+                    studentData.sections.skills = skillsTopics;
+                }
+                
+                // Рекомендації
+                const recommendationsInputs = student.querySelectorAll('.recommendations-topics .topic-item input');
+                const recommendationsTopics = Array.from(recommendationsInputs)
+                    .map(input => input.value.trim())
+                    .filter(value => value);
+                
+                if (recommendationsTopics.length > 0) {
+                    report += `\n📈 RECOMMENDATIONS FOR IMPROVEMENT:\n`;
+                    recommendationsTopics.forEach((topic, i) => {
+                        report += `   💡 ${topic}\n`;
+                    });
+                    studentData.sections.recommendations = recommendationsTopics;
+                }
+                
+                reportData.push(studentData);
+                
+                if (index < students.length - 1) {
+                    report += '\n' + '='.repeat(50) + '\n\n';
+                }
+            });
+            
+            // Детальна статистика
+            report += `\n\n📊 COMPREHENSIVE MONTHLY STATISTICS:\n`;
+            report += `${'-'.repeat(40)}\n`;
+            report += `👥 Total Students: ${students.length}\n`;
+            
+            const totalGrammarTopics = document.querySelectorAll('.grammar-topics .topic-item input').length;
+            const totalVocabularyTopics = document.querySelectorAll('.vocabulary-topics .topic-item input').length;
+            const totalSkillsTopics = document.querySelectorAll('.skills-topics .topic-item input').length;
+            const totalRecommendations = document.querySelectorAll('.recommendations-topics .topic-item input').length;
+            
+            report += `📖 Grammar Topics Covered: ${totalGrammarTopics}\n`;
+            report += `💬 Vocabulary Themes Studied: ${totalVocabularyTopics}\n`;
+            report += `🎯 Skills Developed: ${totalSkillsTopics}\n`;
+            report += `📈 Improvement Areas Identified: ${totalRecommendations}\n`;
+            
+            const averageTopicsPerStudent = students.length > 0 ? 
+                Math.round((totalGrammarTopics + totalVocabularyTopics) / students.length) : 0;
+            report += `📊 Average Topics per Student: ${averageTopicsPerStudent}\n`;
+            
+            report += `Keep up the outstanding work! 💪✨🌟\n\n`;
+            report += `Generated on: ${new Date().toLocaleDateString('uk-UA')} 📅`;
+            
+            document.getElementById('output').textContent = report;
+            showNotification('✅ Звіт успішно згенеровано!', 'success');
+            animateProgress();
+        }
+
+        function copyToClipboard() {
+            const output = document.getElementById('output');
+            const text = output.textContent;
+            
+            if (text.includes('Готово до створення звіту!')) {
+                showNotification('⚠️ Спочатку згенеруйте звіт!', 'error');
+                return;
+            }
+
+            navigator.clipboard.writeText(text).then(function() {
+                showNotification('✅ Звіт скопійовано в буфер обміну!', 'success');
+            }).catch(function(err) {
+                // Fallback для старих браузерів
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showNotification('✅ Звіт скопійовано!', 'success');
+            });
+        }
+
+        function exportReport() {
+            // Функція видалена - використовуйте копіювання звіту
+        }
+
+        function saveTemplate() {
+            // Функція видалена 
+        }
+
+        function loadTemplate() {
+            // Функція видалена
+        }
+
+        function handleTemplateFile(event) {
+            // Функція видалена
+        }
+
+        function showNotification(message, type = 'info') {
+            // Видаляємо попереднє сповіщення
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            
+            // Стилі для сповіщення
+            const colors = {
+                success: '#28a745',
+                error: '#dc3545',
+                info: '#17a2b8'
+            };
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${colors[type] || colors.info};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                z-index: 10000;
+                font-weight: 600;
+                animation: slideInRight 0.3s ease-out;
+                max-width: 300px;
+                word-wrap: break-word;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-in forwards';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Додаткові CSS анімації
+        const additionalStyles = document.createElement('style');
+        additionalStyles.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; max-height: 200px; }
+                to { transform: translateX(-100%); opacity: 0; max-height: 0; padding: 0; margin: 0; }
+            }
+        `;
+        document.head.appendChild(additionalStyles);
+
+        // Автозбереження в localStorage (якщо доступно)
+        setInterval(() => {
+            try {
+                const autoSaveData = {
+                    month: document.getElementById('month').value,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('english_report_autosave', JSON.stringify(autoSaveData));
+            } catch (e) {
+                // localStorage недоступний - ігноруємо
+            }
+        }, 30000); // Кожні 30 секунд
+
+        // Регулярне оновлення статистики
+        setInterval(updateStats, 2000);
+        setInterval(animateProgress, 5000);
+    </script>
+</body>
+</html>
