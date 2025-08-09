@@ -1102,39 +1102,52 @@
             showNotification(`✅ Обрано рівень ${level}! Шаблони завантажено.`, 'success');
         }
 
-        function loadTemplatesForLevel(level) {
-            const templatesContent = document.getElementById('templates-content');
-            const data = templatesData[level];
-            
-            if (!data) return;
-            
-            let html = `
-                <div class="level-header" id="level-header">📚 ${level} LEVEL TEMPLATES</div>
-                
-                <div style="margin-bottom: 20px;">
-                    <h6 style="color: #007bff; font-weight: 600; margin-bottom: 10px;">🔤 ГРАМАТИЧНІ ШАБЛОНИ:</h6>
-            `;
-            
-            data.grammar.forEach(template => {
-                html += `<button class="template-btn grammar" onclick="addTemplate('grammar', '${template.replace(/'/g, "\\'")}')">${template.split(' — ')[0]}</button>`;
-            });
-            
-            html += `
-                </div>
-                
-                <div>
-                    <h6 style="color: #17a2b8; font-weight: 600; margin-bottom: 10px;">📚 ЛЕКСИЧНІ ШАБЛОНИ:</h6>
-            `;
-            
-            data.vocabulary.forEach(template => {
-                html += `<button class="template-btn vocabulary" onclick="addTemplate('vocabulary', '${template.replace(/'/g, "\\'")}')">${template.split(' — ')[0]}</button>`;
-            });
-            
-            html += '</div>';
-            
-            templatesContent.innerHTML = html;
-			updateLevelHeader();
-        }
+	function loadTemplatesForLevel(level) {
+		const templatesContent = document.getElementById('templates-content');
+		const data = templatesData[level];
+		
+		if (!data) return;
+		
+		let html = `
+			<div class="level-header" id="level-header">📚 ${level} LEVEL TEMPLATES</div>
+			
+			<div style="margin-bottom: 20px;">
+				<h6 style="color: #007bff; font-weight: 600; margin-bottom: 10px;">🔤 ГРАМАТИЧНІ ШАБЛОНИ:</h6>
+		`;
+		
+		data.grammar.forEach((template, index) => {
+			html += `<button class="template-btn grammar" data-template-type="grammar" data-template-index="${index}" data-level="${level}">${template.split(' — ')[0]}</button>`;
+		});
+		
+		html += `
+			</div>
+			
+			<div>
+				<h6 style="color: #17a2b8; font-weight: 600; margin-bottom: 10px;">📚 ЛЕКСИЧНІ ШАБЛОНИ:</h6>
+		`;
+		
+		data.vocabulary.forEach((template, index) => {
+			html += `<button class="template-btn vocabulary" data-template-type="vocabulary" data-template-index="${index}" data-level="${level}">${template.split(' — ')[0]}</button>`;
+		});
+		
+		html += '</div>';
+		
+		templatesContent.innerHTML = html;
+		
+		// Додаємо безпечні обробники подій
+		document.querySelectorAll('.template-btn').forEach(btn => {
+			btn.addEventListener('click', function() {
+				const type = this.dataset.templateType;
+				const index = parseInt(this.dataset.templateIndex);
+				const levelData = this.dataset.level;
+				const template = templatesData[levelData][type][index];
+				addTemplate(type, template);
+			});
+		});
+		
+		resetAllTemplates();
+		updateLevelHeader();
+	}
 
         function addStudent() {
             const container = document.getElementById('students-container');
@@ -1238,15 +1251,21 @@
             animateProgress();
         }
 
-        function removeTopic(button) {
-            const topicItem = button.parentElement;
-            topicItem.style.animation = 'slideOut 0.3s ease-out forwards';
-            setTimeout(() => {
-                topicItem.remove();
-                updateStats();
-                animateProgress();
-            }, 300);
-        }
+		 function removeTopic(button) {
+			const topicItem = button.parentElement;
+			const inputValue = topicItem.querySelector('input').value;
+			
+			topicItem.style.animation = 'slideOut 0.3s ease-out forwards';
+			setTimeout(() => {
+				topicItem.remove();
+				
+				// Знаходимо і розмічаємо шаблон як невикористаний
+				markTemplateAsUnused(inputValue);
+				
+				updateStats();
+				animateProgress();
+			}, 300);
+		}
 
 		function addTemplate(type, text) {
 			if (currentStudentId === null) {
@@ -1258,11 +1277,21 @@
 			const topicDiv = document.createElement('div');
 			topicDiv.className = 'topic-item';
 			
-			topicDiv.innerHTML = `
-				<input type="text" value="${text}" onchange="updateStats()">
-				<button class="remove-topic" onclick="removeTopic(this); markTemplateAsUnused('${text}')">×</button>
-			`;
+			// Створюємо input та button через DOM замість innerHTML
+			const input = document.createElement('input');
+			input.type = 'text';
+			input.value = text;
+			input.onchange = updateStats;
 			
+			const removeButton = document.createElement('button');
+			removeButton.className = 'remove-topic';
+			removeButton.textContent = '×';
+			removeButton.onclick = function() {
+				removeTopic(this);
+			};
+			
+			topicDiv.appendChild(input);
+			topicDiv.appendChild(removeButton);
 			container.appendChild(topicDiv);
 			
 			// Анімація успішного додавання
@@ -1505,10 +1534,12 @@
             });
         }
 		
-				function markTemplateAsUsed(templateText) {
+		function markTemplateAsUsed(templateText) {
 			const templateBtns = document.querySelectorAll('.template-btn');
 			templateBtns.forEach(btn => {
-				if (btn.textContent.trim() === templateText.split(' — ')[0]) {
+				const btnText = btn.textContent.trim();
+				const templateShort = templateText.split(' — ')[0].trim();
+				if (btnText === templateShort) {
 					btn.classList.add('used');
 				}
 			});
@@ -1517,7 +1548,9 @@
 		function markTemplateAsUnused(templateText) {
 			const templateBtns = document.querySelectorAll('.template-btn');
 			templateBtns.forEach(btn => {
-				if (btn.textContent.trim() === templateText.split(' — ')[0]) {
+				const btnText = btn.textContent.trim();
+				const templateShort = templateText.split(' — ')[0].trim();
+				if (btnText === templateShort) {
 					btn.classList.remove('used');
 				}
 			});
