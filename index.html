@@ -55,11 +55,14 @@
             0% { transform: translate(-50px, -50px) rotate(0deg); }
             100% { transform: translate(-50px, -50px) rotate(360deg); }
         }
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
+		.header h1 {
+			font-size: 2.0em;
+			margin-bottom: 10px;
+			position: relative;
+			z-index: 1;
+			font-weight: 320;
+			text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		}
         }
         .header p {
             font-size: 1.1em;
@@ -1756,7 +1759,7 @@
                 return;
             }
             let report = `${month.toUpperCase()} ENGLISH LEARNING REPORT 📚✨\n`;
-            report += `${'='.repeat(50)}\n`;
+            report += `${'='.repeat(25)}\n`;
             reportData = [];
             students.forEach((student, index) => {
                 const nameInput = student.querySelector('.student-name-input');
