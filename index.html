@@ -470,7 +470,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         .stat-number {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
             color: #667eea;
         }
@@ -548,6 +548,11 @@
             .level-btn {
                 min-width: 120px;
             }
+			
+			.month-section .month-label {
+				display: block;
+				margin-bottom: 8px; /* Зменшено з 20+ пікселів до 8px */
+			}
         }
     </style>
 </head>
@@ -559,7 +564,7 @@
         </div>
         <div class="main-content">
             <div class="month-section">
-                <label for="month"><strong>🗓️ Оберіть місяць звіту:</strong></label><br><br>
+                <label for="month" class="month-label"><strong>🗓️ Оберіть місяць звіту:</strong></label>
                 <select id="month">
                     <option value="January">January</option>
                     <option value="February">February</option>
