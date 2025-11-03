@@ -63,7 +63,6 @@
 			font-weight: 320;
 			text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 		}
-        }
         .header p {
             font-size: 1.1em;
             opacity: 0.9;
@@ -144,6 +143,51 @@
             right: 8px;
             top: 50%;
             transform: translateY(-50%);
+        }
+        .tag-search-container {
+            background: #F5F5F5;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .tag-search-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+        }
+        .tag-search-input {
+            width: 100%;
+            padding: 12px 20px 12px 50px;
+            font-size: 14px;
+            border: 2px solid #6A5ACD;
+            border-radius: 25px;
+            background: white;
+            outline: none;
+            transition: all 0.3s ease;
+            color: #333;
+        }
+        .tag-search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(106, 90, 205, 0.3);
+        }
+        .tag-search-input::placeholder {
+            color: #999;
+        }
+        .tag-search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+        }
+        .tag-search-icon svg {
+            width: 100%;
+            height: 100%;
         }
         .student-card {
             background: #fff;
@@ -589,6 +633,22 @@
                     <button class="level-btn" onclick="selectLevel('B1')">📘 B1 - Intermediate</button>
                     <button class="level-btn" onclick="selectLevel('B2')">📗 B2 - Upper-Intermediate</button>
                     <button class="level-btn" onclick="selectLevel('C1')">📕 C1 - Advanced</button>
+                </div>
+            </div>
+
+            <div class="tag-search-container">
+                <div class="tag-search-wrapper">
+                    <div class="tag-search-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="11" cy="11" r="7" stroke="#ADD8E6" stroke-width="2"/>
+                            <path d="m20 20-4.35-4.35" stroke="#800080" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <input type="text" 
+                           class="tag-search-input" 
+                           id="tag-search-input" 
+                           placeholder="Шукати теми (наприклад: present, food, passive...)" 
+                           oninput="filterTopics(this.value)">
                 </div>
             </div>
 
@@ -1070,6 +1130,12 @@
             templatesSection.classList.add('show');
             loadTemplatesForLevel(level);
             resetAllTemplates();
+            // Очистити поле пошуку при виборі нового рівня
+            const searchInput = document.getElementById('tag-search-input');
+            if (searchInput) {
+                searchInput.value = '';
+                filterTopics('');
+            }
             showNotification(`✅ Обрано рівень ${level}! Шаблони завантажено.`, 'success');
         }
 
@@ -1542,6 +1608,60 @@
             updateLevelHeader();
         }
 
+        function filterTopics(searchQuery) {
+            const query = searchQuery.toLowerCase().trim();
+            const templateButtons = document.querySelectorAll('.template-btn');
+            
+            if (!query) {
+                // Якщо поле порожнє, показати всі кнопки
+                templateButtons.forEach(btn => {
+                    btn.style.display = '';
+                });
+                // Показати всі категорії
+                document.querySelectorAll('.template-category, h4').forEach(el => {
+                    el.style.display = '';
+                });
+                return;
+            }
+
+            let hasVisibleButtons = false;
+            
+            templateButtons.forEach(btn => {
+                const templateText = btn.textContent.toLowerCase();
+                const fullTemplate = btn.dataset.template?.toLowerCase() || '';
+                
+                // Перевірка чи текст кнопки або повний шаблон містить запит
+                if (templateText.includes(query) || fullTemplate.includes(query)) {
+                    btn.style.display = '';
+                    hasVisibleButtons = true;
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+
+            // Приховати категорії, які не містять видимих кнопок
+            document.querySelectorAll('.template-category').forEach(category => {
+                const visibleButtons = Array.from(category.querySelectorAll('.template-btn')).filter(
+                    btn => btn.style.display !== 'none'
+                );
+                if (visibleButtons.length === 0) {
+                    category.style.display = 'none';
+                    // Приховати заголовок категорії, якщо він є перед цією категорією
+                    const prevSibling = category.previousElementSibling;
+                    if (prevSibling && prevSibling.tagName === 'H4') {
+                        prevSibling.style.display = 'none';
+                    }
+                } else {
+                    category.style.display = '';
+                    // Показати заголовок категорії, якщо він є перед цією категорією
+                    const prevSibling = category.previousElementSibling;
+                    if (prevSibling && prevSibling.tagName === 'H4') {
+                        prevSibling.style.display = '';
+                    }
+                }
+            });
+        }
+
         function addStudent() {
             const container = document.getElementById('students-container');
             const studentDiv = document.createElement('div');
@@ -1819,8 +1939,6 @@
             report += `🎯 Skills Developed: ${document.querySelectorAll('.skills-topics .topic-item input').length}\n`;
             report += `📈 Improvement Areas Identified: ${document.querySelectorAll('.recommendations-topics .topic-item input').length}\n`;
             const avg = students.length > 0 ? Math.round((document.querySelectorAll('.grammar-topics .topic-item input').length + document.querySelectorAll('.vocabulary-topics .topic-item input').length) / students.length) : 0;
-            report += `📊 Average Topics per Student: ${avg}\n`;
-            report += `Keep up the outstanding work! 💪✨🌟\n`;
             report += `Generated on: ${new Date().toLocaleDateString('uk-UA')} 📅`;
 
             document.getElementById('output').textContent = report;
