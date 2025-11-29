@@ -264,8 +264,9 @@
         }
         .topics-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start; /* Вирівнювання по лівому краю, а не по боках */
             align-items: center;
+            gap: 10px; /* Відступ між текстом і кнопкою */
             margin-bottom: 5px;
             padding: 5px 0;
         }
@@ -285,9 +286,9 @@
             font-weight: 600;
             transition: all 0.3s ease;
         }
-        .add-topic-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+		.add-topic-btn:hover {
+            transform: scale(1.1); /* Легке збільшення при наведенні */
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.4);
         }
         .topic-item {
             display: flex;
@@ -1677,28 +1678,27 @@
                 <div class="topics-section">
                     <div class="topics-header">
                         <h4>📝 Граматичні теми</h4>
-                        <button class="add-topic-btn" onclick="addTopic(${studentCount}, 'grammar')">+ Додати</button>
-                    </div>
+                        <button class="add-topic-btn" onclick="addTopic(${studentCount}, 'grammar')">+
                     <div class="grammar-topics" data-student="${studentCount}"></div>
                 </div>
                 <div class="topics-section">
                     <div class="topics-header">
                         <h4>📚 Лексичні теми</h4>
-                        <button class="add-topic-btn" onclick="addTopic(${studentCount}, 'vocabulary')">+ Додати</button>
+                        <button class="add-topic-btn" onclick="addTopic(${studentCount}, 'vocabulary')">+</button>
                     </div>
                     <div class="vocabulary-topics" data-student="${studentCount}"></div>
                 </div>
                 <div class="topics-section">
                     <div class="topics-header">
                         <h4>🎯 Навички та досягнення</h4>
-                        <button class="add-topic-btn" onclick="addTopic(${studentCount}, 'skills')">+ Додати</button>
+                        <button class="add-topic-btn" onclick="addTopic(${studentCount}, 'skills')">+</button>
                     </div>
                     <div class="skills-topics" data-student="${studentCount}"></div>
                 </div>
                 <div class="topics-section">
                     <div class="topics-header">
                         <h4>📈 Рекомендації для покращення</h4>
-                        <button class="add-topic-btn" onclick="addTopic(${studentCount}, 'recommendations')">+ Додати</button>
+                        <button class="add-topic-btn" onclick="addTopic(${studentCount}, 'recommendations')">+</button>
                     </div>
                     <div class="recommendations-topics" data-student="${studentCount}"></div>
                 </div>
@@ -1876,70 +1876,75 @@
             }, 100);
         }
 
-        function generateReport() {
+		function generateReport() {
             const month = document.getElementById('month').value;
             const students = document.querySelectorAll('.student-card');
+
             if (students.length === 0) {
                 showNotification('⚠️ Додайте хоча б одного студента!', 'error');
                 return;
             }
-            let report = `${month.toUpperCase()} ENGLISH LEARNING REPORT 📚✨\n`;
-            report += `${'='.repeat(25)}\n`;
-            reportData = [];
+
+            // Заголовок звіту (Жирний шрифт)
+            let report = `**${month.toUpperCase()} ENGLISH LEARNING REPORT 📚✨**\n\n`;
+
             students.forEach((student, index) => {
                 const nameInput = student.querySelector('.student-name-input');
                 const studentName = nameInput.value.trim() || `Student ${index + 1}`;
-                const studentData = { name: studentName, sections: {} };
-                report += `🌟 ${studentName.toUpperCase()}\n`;
-                report += `${'-'.repeat(30)}\n`;
 
+                // Ім'я студента (Жирний шрифт, без підкреслень)
+                report += `🌟 **${studentName.toUpperCase()}**\n`;
+
+                // Граматика
                 const grammarInputs = student.querySelectorAll('.grammar-topics .topic-item input');
                 const grammarTopics = Array.from(grammarInputs).map(input => input.value.trim()).filter(v => v);
                 if (grammarTopics.length > 0) {
                     report += `\n📝 GRAMMAR TOPICS MASTERED:\n`;
                     grammarTopics.forEach((topic, i) => { report += `   ${i + 1}. ${topic}\n`; });
-                    studentData.sections.grammar = grammarTopics;
                 }
 
+                // Лексика
                 const vocabularyInputs = student.querySelectorAll('.vocabulary-topics .topic-item input');
                 const vocabularyTopics = Array.from(vocabularyInputs).map(input => input.value.trim()).filter(v => v);
                 if (vocabularyTopics.length > 0) {
                     report += `\n📚 VOCABULARY THEMES EXPLORED:\n`;
                     vocabularyTopics.forEach((topic, i) => { report += `   ${i + 1}. ${topic}\n`; });
-                    studentData.sections.vocabulary = vocabularyTopics;
                 }
 
+                // Навички (якщо є)
                 const skillsInputs = student.querySelectorAll('.skills-topics .topic-item input');
                 const skillsTopics = Array.from(skillsInputs).map(input => input.value.trim()).filter(v => v);
                 if (skillsTopics.length > 0) {
                     report += `\n🎯 SKILLS & ACHIEVEMENTS:\n`;
-                    skillsTopics.forEach((topic, i) => { report += `   ✅ ${topic}\n`; });
-                    studentData.sections.skills = skillsTopics;
+                    skillsTopics.forEach((topic, i) => { report += `   ${i + 1}. ${topic}\n`; });
                 }
 
+                // Рекомендації (якщо є)
                 const recommendationsInputs = student.querySelectorAll('.recommendations-topics .topic-item input');
                 const recommendationsTopics = Array.from(recommendationsInputs).map(input => input.value.trim()).filter(v => v);
                 if (recommendationsTopics.length > 0) {
                     report += `\n📈 RECOMMENDATIONS FOR IMPROVEMENT:\n`;
-                    recommendationsTopics.forEach((topic, i) => { report += `   💡 ${topic}\n`; });
-                    studentData.sections.recommendations = recommendationsTopics;
+                    recommendationsTopics.forEach((topic, i) => { report += `   ${i + 1}. ${topic}\n`; });
                 }
 
-                reportData.push(studentData);
+                // Відступ між студентами (два порожні рядки)
                 if (index < students.length - 1) {
-                    report += '\n' + '='.repeat(50) + '\n';
+                    report += '\n\n';
                 }
             });
 
-            report += `\n📊 COMPREHENSIVE MONTHLY STATISTICS:\n`;
-            report += `${'-'.repeat(40)}\n`;
+            // Блок статистики
+            report += `\n\n📊 **COMPREHENSIVE MONTHLY STATISTICS:**\n`;
+            report += `----------------------------------------\n`;
             report += `👥 Total Students: ${students.length}\n`;
             report += `📖 Grammar Topics Covered: ${document.querySelectorAll('.grammar-topics .topic-item input').length}\n`;
             report += `💬 Vocabulary Themes Studied: ${document.querySelectorAll('.vocabulary-topics .topic-item input').length}\n`;
             report += `🎯 Skills Developed: ${document.querySelectorAll('.skills-topics .topic-item input').length}\n`;
             report += `📈 Improvement Areas Identified: ${document.querySelectorAll('.recommendations-topics .topic-item input').length}\n`;
-            const avg = students.length > 0 ? Math.round((document.querySelectorAll('.grammar-topics .topic-item input').length + document.querySelectorAll('.vocabulary-topics .topic-item input').length) / students.length) : 0;
-            report += `Generated on: ${new Date().toLocaleDateString('uk-UA')} 📅`;
+            
+            const date = new Date();
+            const formattedDate = date.toLocaleDateString('uk-UA'); // Формат DD.MM.YYYY
+            report += `Generated on: ${formattedDate} 📅`;
 
             document.getElementById('output').textContent = report;
             showNotification('✅ Звіт успішно згенеровано!', 'success');
